@@ -9,3 +9,9 @@ ENV/
 *.egg-info/
 dist/
 build/
+.env
+.env.*
+!.env.example
+*.db
+*.sqlite
+*.sqlite3

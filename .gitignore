@@ -26,3 +26,11 @@ frontend/*.local
 *.njsproj
 *.sln
 *.sw?
+# Environments & Secrets
+.env
+.env.*
+!.env.example
+*.db
+*.sqlite
+*.sqlite3
+

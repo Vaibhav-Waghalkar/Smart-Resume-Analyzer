@@ -1,335 +1,177 @@
-# Smart Resume Analyzer
+# Smart Resume Analyzer AI v2.0 🚀
 
-A full-stack application for analyzing resumes using AI and machine learning. Upload a PDF resume, extract key information, score it against job requirements, and get personalized improvement suggestions.
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.138.0-009688.svg?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![React](https://img.shields.io/badge/React-19-61DAFB.svg?logo=react&logoColor=black)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-8-646CFF.svg?logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-38B2AC.svg?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Google Gemini](https://img.shields.io/badge/Gemini_3.8_Flash-Google_AI-4285F4.svg?logo=google&logoColor=white)](https://ai.google.dev/)
+[![Groq](https://img.shields.io/badge/Groq-Inference_Llama_3.3_&_Whisper-F55036.svg)](https://groq.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## Features
+An intelligent, full-stack career acceleration platform combining **ATS Resume Scoring**, **Google Gemini 3.8 Flash bullet point rewrites**, **Voice-powered AI Mock Interviews with Web Speech & Groq Whisper fallback**, and **Daily Practice Streaks with 90-day activity heatmaps**.
 
-- **PDF Resume Upload**: Drag-and-drop or click to upload PDF resumes
-- **Text Extraction**: Extract text from PDFs using pdfplumber with PyPDF2 fallback
-- **Resume Parsing**: Extract name, email, phone, skills, education, and experience using spaCy NER
-- **Job-Specific Scoring**: Score resumes against 10+ predefined job roles with weighted factors
-- **Skill Analysis**: Match resume skills against job requirements with TF-IDF similarity for unknown roles
-- **Improvement Suggestions**: Get actionable suggestions grouped by priority (high/medium/low)
-- **Modern UI**: Beautiful, responsive React interface with Tailwind CSS and Recharts visualizations
+---
 
-## Project Structure
+## 📸 Key Features & Architecture Preview
 
 ```
-/smart-resume-analyzer
-  /backend/
-    main.py                    # FastAPI application entry point
-    requirements.txt           # Python dependencies
-    run.bat / stop.bat         # Windows start/stop scripts
-    /routes/
-      resume_routes.py         # API endpoints for resume operations
-    /services/
-      text_extractor.py        # PDF text extraction service
-      resume_parser.py         # Resume parsing service (spaCy)
-      resume_scorer.py         # Resume scoring service
-      suggestion_engine.py     # Improvement suggestions service
-    /models/                   # Pydantic models
-    /utils/                    # Utility functions
-  /frontend/
-    src/
-      App.jsx                  # Main React component
-      /components/
-        UploadSection.jsx       # File upload component
-        ResultsDashboard.jsx    # Results display component
-      /api/
-        resumeApi.js            # API service layer
-    index.css                   # Tailwind CSS directives
-    tailwind.config.js         # Tailwind configuration
-    run-frontend.bat            # Windows start script
-  /sample-resumes/             # Sample resume PDFs for testing
-  README.md                    # This file
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                       SMART RESUME ANALYZER v2.0                            │
+├───────────────────────────────┬─────────────────────────────────────────────┤
+│  🎯 1. Resume ATS Scorer      │  🎙️ 2. AI Mock Interview Simulator          │
+│  • PDF text extraction        │  • Personalized questions from resume & role│
+│  • Multi-factor match gauge   │  • Voice mode (Web Speech API + Whisper)    │
+│  • Skill match vs missing bars│  • SpeechSynthesis audio playback           │
+│  • Google XYZ formula rewrites│  • Gemini post-interview evaluation report  │
+├───────────────────────────────┼─────────────────────────────────────────────┤
+│  🔥 3. Daily Streaks & Habits │  📈 4. Performance Analytics                │
+│  • Active practice streak     │  • Recharts score progression over time     │
+│  • 90-day visual heatmap grid │  • Weak area identification & action plans  │
+│  • JWT Auth & SQLite database │  • Production ready: Docker + CORS          │
+└───────────────────────────────┴─────────────────────────────────────────────┘
 ```
 
-## Backend Setup
+---
 
-### Prerequisites
-- Python 3.11 or higher
-- pip (Python package manager)
+## 🌟 Core Capabilities
 
-### Installation
-1. Navigate to the backend directory:
-   ```bash
-   cd backend
-   ```
+### 1. ATS Scoring & Executive Suggestions
+- **PDF Extraction**: Fast and reliable text extraction with `pdfplumber` and `PyPDF2`.
+- **Competency Subscores**: Real-time breakdown across Skill Match, Years of Experience, Education, and Section Completeness.
+- **Gemini 3.8 Flash Enhancements**:
+  - Automatically rewrites weak bullet points using Google's **XYZ Formula** (*Accomplished [X] as measured by [Y] by doing [Z]*).
+  - Flags critical missing keywords for 14+ target roles.
+  - ATS formatting checklists and quantifiable achievement tips.
+  - Strict JSON schema validation via **Pydantic** with automatic retries and Groq fallback.
 
-2. Create a virtual environment:
-   ```bash
-   python -m venv venv
-   ```
+### 2. Voice-Enabled AI Mock Interview Simulator
+- **Dynamic Question Generation**: Generates technical, project, and behavioral questions blended directly from the candidate's actual resume projects.
+- **Dual Voice Support**:
+  - Speak your answers naturally with the **Web Speech API** or backend **Groq Whisper** (`/api/transcribe`).
+  - Listen to interviewer questions with built-in `speechSynthesis` (with an instant mute toggle).
+  - Live recording visualizer and speaking duration timer.
+- **Comprehensive Post-Interview Report**:
+  - No disruptive mid-interview feedback.
+  - Deep per-question grading, filler words audit, structure critique, and **what a 95%+ model answer looks like**.
 
-3. Activate the virtual environment:
-   ```bash
-   # Windows
-   .\venv\Scripts\activate
-   # Linux/Mac
-   source venv/bin/activate
-   ```
+### 3. Habit Building, Streaks & Progress Tracking
+- **Daily Streak Engine**: Tracks daily activity (resume analysis or completed mock interview).
+- **Interactive 90-Day Heatmap**: GitHub-style activity contribution calendar.
+- **Score Progression Curves**: Multi-attempt progression charts rendered with **Recharts**.
+- **Recurring Weaknesses**: Identifies patterns where the candidate consistently loses points across sessions.
 
-4. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+---
 
-5. Download spaCy model:
-   ```bash
-   python -m spacy download en_core_web_sm
-   ```
-
-### Running the Backend
-- **Windows**: Run `run.bat` to start the server on port 8000
-- **Manual**: 
-   ```bash
-   uvicorn main:app --host 0.0.0.0 --port 8000 --reload
-   ```
-
-### Stopping the Backend
-- **Windows**: Run `stop.bat`
-- **Manual**: Press `Ctrl+C` in the terminal
-
-## Frontend Setup
-
-### Prerequisites
-- Node.js 16 or higher
-- npm (comes with Node.js)
-
-### Installation
-1. Navigate to the frontend directory:
-   ```bash
-   cd frontend
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-### Running the Frontend
-- **Windows**: Run `run-frontend.bat`
-- **Manual**:
-   ```bash
-   npm run dev
-   ```
-The frontend will run on port 5173.
-
-## API Endpoints
-
-### Health Check
-**GET** `/api/health`
-
-Returns server health status.
-
-**Response:**
-```json
-{
-  "status": "healthy"
-}
-```
-
-### Upload Resume
-**POST** `/api/upload-resume`
-
-Upload a PDF resume and extract text.
-
-**Request:** `multipart/form-data`
-- `file`: PDF file
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "filename": "resume.pdf",
-    "page_count": 2,
-    "word_count": 450,
-    "file_size": 102400,
-    "extracted_text": "Full resume text..."
-  }
-}
-```
-
-**Error Responses:**
-- `400` - Invalid file format or empty file
-- `422` - Failed to extract text from PDF
-- `500` - Server error
-
-### Parse Resume
-**POST** `/api/parse-resume`
-
-Parse resume text and extract structured information.
-
-**Request:**
-```json
-{
-  "text": "Full resume text..."
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "name": "John Doe",
-    "email": "john@example.com",
-    "phone": "+1-555-123-4567",
-    "skills": ["Python", "JavaScript", "SQL"],
-    "education": [
-      {
-        "degree": "Bachelor of Science in Computer Science",
-        "institution": "University Name",
-        "years": "2018-2022"
-      }
-    ],
-    "experience": [
-      {
-        "job_title": "Software Developer",
-        "company": "Company Name",
-        "duration": "2022-Present"
-      }
-    ],
-    "total_experience_years": 3.5
-  }
-}
-```
-
-### Score Resume
-**POST** `/api/score-resume`
-
-Score a resume against a target job title.
-
-**Request:**
-```json
-{
-  "resume_text": "Full resume text...",
-  "target_job_title": "Data Scientist",
-  "parsed_data": { ... }  // Optional, from parse-resume endpoint
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "overall_score": 75.5,
-    "skill_match_score": 80.0,
-    "matched_skills": ["Python", "SQL", "Machine Learning"],
-    "missing_skills": ["TensorFlow", "PyTorch"],
-    "education_score": 70.0,
-    "experience_score": 75.0,
-    "completeness_score": 80.0,
-    "target_job_title": "Data Scientist"
-  }
-}
-```
-
-**Scoring Weights:**
-- Skill Match: 50%
-- Education: 15%
-- Experience: 20%
-- Formatting/Completeness: 15%
-
-### Get Suggestions
-**POST** `/api/get-suggestions`
-
-Generate improvement suggestions based on score breakdown.
-
-**Request:**
-```json
-{
-  "resume_text": "Full resume text...",
-  "score_data": { ... },  // From score-resume endpoint
-  "target_job_title": "Data Scientist"
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "suggestions": [
-      {
-        "category": "Skills",
-        "priority": "high",
-        "message": "Add these skills to your resume: TensorFlow, PyTorch..."
-      },
-      {
-        "category": "Experience",
-        "priority": "medium",
-        "message": "Highlight quantifiable achievements..."
-      }
-    ]
-  }
-}
-```
-
-## Supported Job Titles
-
-The system supports scoring against the following job titles:
-- Data Scientist
-- Frontend Developer
-- Backend Developer
-- Full Stack Developer
-- DevOps Engineer
-- ML Engineer
-- Android Developer
-- UI/UX Designer
-- Business Analyst
-- QA Engineer
-
-For unknown job titles, the system uses TF-IDF cosine similarity to find the closest match.
-
-## Technology Stack
-
-### Backend
-- **FastAPI** - Modern, fast web framework for building APIs
-- **Python 3.11** - Programming language
-- **pdfplumber** - PDF text extraction (primary)
-- **PyPDF2** - PDF text extraction (fallback)
-- **spaCy** - NLP library for named entity recognition
-- **scikit-learn** - Machine learning for TF-IDF similarity
-- **nltk** - Natural language processing
-- **pandas** - Data manipulation
-- **pydantic** - Data validation
+## 🛠️ Tech Stack
 
 ### Frontend
-- **React** - UI library
-- **Vite** - Build tool and dev server
-- **Tailwind CSS** - Utility-first CSS framework
-- **Recharts** - Chart library for data visualization
-- **Axios** - HTTP client for API requests
+- **Framework**: React 19 + Vite 8
+- **Styling**: Tailwind CSS v4 + Vanilla CSS Design Tokens (Dark / Light mode toggle)
+- **Visualizations**: Recharts (Radial Gauge, Bar Charts, Score Curves)
+- **Icons & Motion**: Lucide React, Framer Motion, Canvas Confetti
+- **Audio & Voice**: Web Speech API (`SpeechRecognition` & `SpeechSynthesis`)
 
-## Usage
+### Backend
+- **Framework**: FastAPI (Async, Python 3.11+)
+- **Database**: SQLite (SQLAlchemy ORM, structured for straightforward PostgreSQL / Supabase migration)
+- **Security & Auth**: JWT Tokens, Password Hashing (`passlib[bcrypt]`), Rate Limiting (`slowapi`)
+- **AI Providers**:
+  - Primary: **Google Gemini 3.8 Flash** via REST JSON schema API
+  - Fallback / Whisper: **Groq** (`llama-3.3-70b-versatile` & `whisper-large-v3`)
 
-1. Start the backend server (port 8000)
-2. Start the frontend server (port 5173)
-3. Open `http://localhost:5173` in your browser
-4. Upload a PDF resume
-5. Select a target job title
-6. Click "Analyze Resume"
-7. View the comprehensive analysis results and suggestions
+---
 
-## Testing
+## 🚀 Quickstart & Local Setup
 
-Place sample resume PDFs in the `/sample-resumes` folder for testing. See `sample-resumes/README.md` for recommendations.
+### Prerequisites
+- Python 3.10+ (or 3.11 recommended)
+- Node.js 18+ and npm
 
-## Troubleshooting
+### 1. Clone the Repository
+```bash
+git clone https://github.com/Vaibhav-Waghalkar/Smart-Resume-Analyzer.git
+cd Smart-Resume-Analyzer
+```
 
-### Backend Issues
-- **spaCy model not found**: Run `python -m spacy download en_core_web_sm`
-- **CORS errors**: Ensure backend is running on port 8000 and frontend on port 5173
-- **PDF extraction fails**: Try a different PDF or check if it's password-protected
+### 2. Backend Setup
+```bash
+cd backend
 
-### Frontend Issues
-- **API connection errors**: Ensure backend is running
-- **Build errors**: Run `npm install` to ensure all dependencies are installed
-- **Port already in use**: Change port in Vite config or stop the process using the port
+# Create virtual environment
+python -m venv venv
+# On Windows:
+.\venv\Scripts\activate
+# On Linux/macOS:
+source venv/bin/activate
 
-## License
+# Install dependencies
+pip install -r requirements.txt
 
-This project is for educational and demonstration purposes.
+# Configure environment variables
+cp .env.example .env
+```
+Open `backend/.env` and insert your Gemini API Key:
+```env
+GEMINI_API_KEY=your_gemini_api_key_here
+GROQ_API_KEY=optional_groq_api_key_here
+JWT_SECRET=supersecret_jwt_key_min_32_chars
+DATABASE_URL=sqlite:///./smart_resume.db
+CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+```
+
+Start the backend:
+```bash
+uvicorn main:app --reload --port 8000
+```
+API Documentation will be available at: [http://localhost:8000/docs](http://localhost:8000/docs)
+
+### 3. Frontend Setup
+```bash
+cd ../frontend
+npm install
+npm run dev
+```
+Open [http://localhost:5173](http://localhost:5173) in your browser.
+
+---
+
+## 🐳 Docker Deployment
+
+To build and run the backend inside a Docker container:
+```bash
+cd backend
+docker build -t smart-resume-backend .
+docker run -p 8000:8000 --env-file .env smart-resume-backend
+```
+
+---
+
+## 🌐 Production Deployment Guide
+
+### Deploy Frontend on Vercel
+1. Push your repository to GitHub.
+2. In [Vercel Dashboard](https://vercel.com), click **Add New Project** and select `Smart-Resume-Analyzer`.
+3. Set the **Root Directory** to `frontend`.
+4. In **Environment Variables**, set:
+   - `VITE_API_URL`: Your deployed backend URL (e.g., `https://smart-resume-api.onrender.com`).
+5. Click **Deploy**.
+
+### Deploy Backend on Render
+1. In [Render Dashboard](https://render.com), create a new **Web Service**.
+2. Connect your GitHub repository.
+3. Configure the service:
+   - **Root Directory**: `backend`
+   - **Environment**: `Python 3` (or `Docker` using the included `backend/Dockerfile`)
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `uvicorn main:app --host 0.0.0.0 --port $PORT`
+4. In **Environment Variables**, add:
+   - `GEMINI_API_KEY`: Your Google AI Studio API key
+   - `GROQ_API_KEY`: (Optional) Groq Cloud key
+   - `JWT_SECRET`: A secure random 32-character string
+   - `CORS_ORIGINS`: Your Vercel frontend domain (e.g., `https://smart-resume-analyzer.vercel.app`)
+5. Click **Create Web Service**.
+
+---
+
+## 📄 License
+This project is open-source and licensed under the [MIT License](LICENSE).

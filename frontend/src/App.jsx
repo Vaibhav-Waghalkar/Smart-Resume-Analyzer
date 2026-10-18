@@ -1,60 +1,140 @@
-import { useState } from 'react'
-import UploadSection from './components/UploadSection'
-import ResultsDashboard from './components/ResultsDashboard'
-import './App.css'
+import React, { useState, useEffect } from 'react';
+import Navbar from './components/Navbar';
+import AuthModal from './components/AuthModal';
+import LandingPage from './pages/LandingPage';
+import DashboardPage from './pages/DashboardPage';
+import ResumeAnalyzerPage from './pages/ResumeAnalyzerPage';
+import MockInterviewPage from './pages/MockInterviewPage';
+import ProgressPage from './pages/ProgressPage';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { resumeApi } from './api/resumeApi';
 
-function App() {
-  const [analysisResults, setAnalysisResults] = useState(null)
-  const [error, setError] = useState(null)
+function MainApp() {
+  const [activeTab, setActiveTab] = useState('landing');
+  const [darkMode, setDarkMode] = useState(() => {
+    return localStorage.getItem('sra_theme') === 'dark' || true;
+  });
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [streakData, setStreakData] = useState(null);
+  const [progressData, setProgressData] = useState(null);
+  const [latestResumeText, setLatestResumeText] = useState('');
+  const [analysisResults, setAnalysisResults] = useState(null);
+  const { user } = useAuth();
 
-  const handleAnalysisComplete = (results) => {
-    setAnalysisResults(results)
-    setError(null)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
+  // Apply dark mode class to root html element
+  useEffect(() => {
+    const root = document.documentElement;
+    if (darkMode) {
+      root.classList.add('dark');
+      localStorage.setItem('sra_theme', 'dark');
+    } else {
+      root.classList.remove('dark');
+      localStorage.setItem('sra_theme', 'light');
+    }
+  }, [darkMode]);
 
-  const handleError = (msg) => setError(msg)
+  // Fetch progress & streak stats whenever user is active or tab changes
+  const fetchOverview = async () => {
+    try {
+      if (user) {
+        const data = await resumeApi.getProgressOverview();
+        setProgressData(data);
+        if (data.streak) setStreakData(data.streak);
+      }
+    } catch (e) {
+      console.warn('Could not fetch progress overview:', e);
+    }
+  };
 
-  const handleReupload = () => {
-    setAnalysisResults(null)
-    setError(null)
-  }
+  useEffect(() => {
+    fetchOverview();
+  }, [user, activeTab]);
+
+  const handleAnalysisDone = (results) => {
+    setAnalysisResults(results);
+    if (results.resumeText) setLatestResumeText(results.resumeText);
+    fetchOverview();
+  };
 
   return (
-    <div className="app-container">
-      <div className="content-wrapper">
+    <div className="min-h-screen flex flex-col bg-[var(--bg-page)] text-[var(--text-primary)] transition-colors duration-200">
+      
+      {/* Top Navigation */}
+      <Navbar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        darkMode={darkMode}
+        setDarkMode={setDarkMode}
+        openAuthModal={() => setAuthModalOpen(true)}
+        streakData={streakData}
+      />
 
-        {/* ── Header ── */}
-        <header className="app-header">
-          <div className="app-header__badge">
-            <span className="app-header__badge-dot" />
-            Obsidian Intelligence
-          </div>
-          <h1 className="type-display-lg">Resume Analyzer</h1>
-          <p className="app-header__subtitle">
-            Upload a PDF resume, select your target role, and get an instant
-            AI-powered match score with actionable improvement signals.
-          </p>
-        </header>
-
-        {/* ── Error ── */}
-        {error && (
-          <div className="error-banner" style={{ marginBottom: 'var(--sp-sm)' }}>
-            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor" style={{ flexShrink: 0, marginTop: 2 }}>
-              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
-            </svg>
-            {error}
-          </div>
+      {/* Main Content Area */}
+      <main className="flex-1">
+        {activeTab === 'landing' && (
+          <LandingPage
+            onGetStarted={() => setActiveTab('analyzer')}
+            onPracticeInterview={() => setActiveTab('interview')}
+          />
         )}
 
-        {/* ── Views ── */}
-        {!analysisResults
-          ? <UploadSection onAnalysisComplete={handleAnalysisComplete} onError={handleError} />
-          : <ResultsDashboard analysisResults={analysisResults} onReupload={handleReupload} />
-        }
-      </div>
+        {activeTab === 'dashboard' && (
+          <DashboardPage
+            setActiveTab={setActiveTab}
+            streakData={streakData}
+            progressData={progressData}
+          />
+        )}
+
+        {activeTab === 'analyzer' && (
+          <ResumeAnalyzerPage
+            onAnalysisDone={handleAnalysisDone}
+            storedResults={analysisResults}
+          />
+        )}
+
+        {activeTab === 'interview' && (
+          <MockInterviewPage
+            resumeText={latestResumeText}
+          />
+        )}
+
+        {activeTab === 'progress' && (
+          <ProgressPage
+            streakData={streakData}
+            progressData={progressData}
+            onRefresh={fetchOverview}
+          />
+        )}
+      </main>
+
+      {/* Footer */}
+      <footer className="border-t border-[var(--border-color)] bg-[var(--bg-surface)] py-6 text-center text-xs text-[var(--text-secondary)]">
+        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p>© {new Date().getFullYear()} Smart Resume Analyzer. Powered by Google Gemini 3.8 & Groq.</p>
+          <div className="flex items-center gap-4">
+            <button onClick={() => setActiveTab('landing')} className="hover:text-emerald-500">Home</button>
+            <button onClick={() => setActiveTab('analyzer')} className="hover:text-emerald-500">ATS Scorer</button>
+            <button onClick={() => setActiveTab('interview')} className="hover:text-emerald-500">Mock Interview</button>
+            <button onClick={() => setActiveTab('progress')} className="hover:text-emerald-500">Streaks</button>
+          </div>
+        </div>
+      </footer>
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={authModalOpen}
+        onClose={() => { setAuthModalOpen(false); fetchOverview(); }}
+      />
+
     </div>
-  )
+  );
 }
 
-export default App
+export default function App() {
+  return (
+    <AuthProvider>
+      <MainApp />
+    </AuthProvider>
+  );
+}

@@ -1,16 +1,26 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
+import os
+import json
+import uuid
+import tempfile
+from typing import Optional, Dict, Any
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from typing import Optional
-import os
-import tempfile
-import uuid
+from sqlalchemy.orm import Session
+
+from database import get_db
+from models.db_models import User, Resume, ResumeScore
+from services.auth_service import get_current_user_optional
 from services.text_extractor import extract_text_from_pdf, get_pdf_metadata
 from services.resume_parser import parse_resume
 from services.resume_scorer import score_resume
 from services.suggestion_engine import generate_suggestions
+from services.ai_suggestions import get_enhanced_ai_suggestions
+from services.streak_service import record_activity
 
-router = APIRouter()
+router = APIRouter(tags=["resume"])
+
+MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB limit
 
 
 class ResumeTextRequest(BaseModel):
@@ -30,239 +40,149 @@ class SuggestionsRequest(BaseModel):
 
 
 @router.post("/api/upload-resume")
-async def upload_resume(file: UploadFile = File(...)):
+async def upload_resume(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    user: Optional[User] = Depends(get_current_user_optional)
+):
     """
-    Upload and extract text from a PDF resume.
-    
-    Args:
-        file: PDF file upload
-        
-    Returns:
-        JSON response with extracted text and metadata
+    Upload and extract text from a PDF resume with size and format validation.
     """
-    # Validate file is a PDF
     if not file.filename or not file.filename.lower().endswith('.pdf'):
         raise HTTPException(
             status_code=400,
-            detail="Invalid file format. Only PDF files are allowed."
+            detail="Invalid file format. Only PDF files are supported."
         )
-    
-    # Check if file is empty
-    if file.size == 0:
-        raise HTTPException(
-            status_code=400,
-            detail="Empty file uploaded."
-        )
-    
-    # Create temporary file
+
+    # Read and validate file content
+    content = await file.read()
+    if len(content) == 0:
+        raise HTTPException(status_code=400, detail="Empty file uploaded.")
+    if len(content) > MAX_FILE_SIZE:
+        raise HTTPException(status_code=400, detail="File exceeds maximum allowed size of 10MB.")
+
     temp_dir = tempfile.gettempdir()
     temp_filename = f"{uuid.uuid4()}_{file.filename}"
     temp_file_path = os.path.join(temp_dir, temp_filename)
-    
+
     try:
-        # Save uploaded file to temporary location
         with open(temp_file_path, "wb") as temp_file:
-            content = await file.read()
             temp_file.write(content)
-        
-        # Validate file size after saving (additional check)
-        if os.path.getsize(temp_file_path) == 0:
-            raise HTTPException(
-                status_code=400,
-                detail="Empty file uploaded."
-            )
-        
-        # Extract text from PDF
+
         extracted_text, error = extract_text_from_pdf(temp_file_path)
-        
         if error:
             raise HTTPException(
                 status_code=422,
                 detail=f"Failed to extract text from PDF: {error}"
             )
-        
-        # Get metadata
+
         metadata = get_pdf_metadata(temp_file_path)
-        
-        # Calculate word count
         word_count = len(extracted_text.split()) if extracted_text else 0
-        
-        # Prepare response
-        response_data = {
+
+        # Persist resume record in database
+        resume_record = Resume(
+            user_id=user.id if user else None,
+            filename=file.filename,
+            extracted_text=extracted_text
+        )
+        db.add(resume_record)
+        db.commit()
+        db.refresh(resume_record)
+
+        if user:
+            record_activity(db, user.id, "resume_analysis", f"Uploaded {file.filename}")
+
+        return JSONResponse(status_code=200, content={
             "success": True,
             "data": {
+                "resume_id": resume_record.id,
                 "filename": file.filename,
                 "page_count": metadata.get("page_count", 0),
                 "word_count": word_count,
-                "file_size": metadata.get("file_size", 0),
+                "file_size": len(content),
                 "extracted_text": extracted_text
             }
-        }
-        
-        return JSONResponse(status_code=200, content=response_data)
-        
-    except HTTPException:
-        # Re-raise HTTP exceptions
-        raise
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"An unexpected error occurred: {str(e)}"
-        )
+        })
     finally:
-        # Clean up temporary file
         if os.path.exists(temp_file_path):
             try:
                 os.remove(temp_file_path)
             except Exception:
-                pass  # Best effort cleanup
+                pass
 
 
 @router.post("/api/parse-resume")
 async def parse_resume_endpoint(request: ResumeTextRequest):
-    """
-    Parse resume text and extract structured information.
+    if not request.text or not request.text.strip():
+        raise HTTPException(status_code=400, detail="Resume text cannot be empty.")
     
-    Args:
-        request: ResumeTextRequest containing the text to parse
-        
-    Returns:
-        JSON response with parsed resume data (name, email, phone, skills, education, experience, total_experience_years)
-    """
-    try:
-        # Validate input
-        if not request.text or not request.text.strip():
-            raise HTTPException(
-                status_code=400,
-                detail="Resume text cannot be empty."
-            )
-        
-        # Parse resume using the service
-        parsed_data = parse_resume(request.text)
-        
-        # Prepare response
-        response_data = {
-            "success": True,
-            "data": parsed_data
-        }
-        
-        return JSONResponse(status_code=200, content=response_data)
-        
-    except ImportError as e:
-        raise HTTPException(
-            status_code=500,
-            detail=str(e)
-        )
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"An unexpected error occurred during parsing: {str(e)}"
-        )
+    parsed_data = parse_resume(request.text)
+    return JSONResponse(status_code=200, content={"success": True, "data": parsed_data})
 
 
 @router.post("/api/score-resume")
-async def score_resume_endpoint(request: ScoreResumeRequest):
-    """
-    Score a resume against a target job title.
-    
-    Args:
-        request: ScoreResumeRequest containing resume_text, target_job_title, and optional parsed_data
-        
-    Returns:
-        JSON response with scoring breakdown
-    """
-    try:
-        # Validate input
-        if not request.resume_text or not request.resume_text.strip():
-            raise HTTPException(
-                status_code=400,
-                detail="Resume text cannot be empty."
-            )
-        
-        if not request.target_job_title or not request.target_job_title.strip():
-            raise HTTPException(
-                status_code=400,
-                detail="Target job title cannot be empty."
-            )
-        
-        # Score the resume
-        score_data = score_resume(
-            request.resume_text,
-            request.target_job_title,
-            request.parsed_data
-        )
-        
-        # Prepare response
-        response_data = {
-            "success": True,
-            "data": score_data
-        }
-        
-        return JSONResponse(status_code=200, content=response_data)
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"An unexpected error occurred during scoring: {str(e)}"
-        )
+async def score_resume_endpoint(
+    request: ScoreResumeRequest,
+    db: Session = Depends(get_db),
+    user: Optional[User] = Depends(get_current_user_optional)
+):
+    if not request.resume_text or not request.resume_text.strip():
+        raise HTTPException(status_code=400, detail="Resume text cannot be empty.")
+    if not request.target_job_title or not request.target_job_title.strip():
+        raise HTTPException(status_code=400, detail="Target job title cannot be empty.")
+
+    score_data = score_resume(
+        request.resume_text,
+        request.target_job_title,
+        request.parsed_data
+    )
+
+    # Persist score if user or session
+    score_record = ResumeScore(
+        user_id=user.id if user else None,
+        target_job_title=request.target_job_title,
+        overall_score=score_data.get("overall_score", 0),
+        breakdown_json=json.dumps(score_data)
+    )
+    db.add(score_record)
+    db.commit()
+
+    if user:
+        record_activity(db, user.id, "resume_analysis", f"Scored resume for {request.target_job_title}")
+
+    return JSONResponse(status_code=200, content={"success": True, "data": score_data})
 
 
 @router.post("/api/get-suggestions")
 async def get_suggestions_endpoint(request: SuggestionsRequest):
     """
-    Generate improvement suggestions based on score breakdown.
-    
-    Args:
-        request: SuggestionsRequest containing resume_text, score_data, and target_job_title
-        
-    Returns:
-        JSON response with suggestions list
+    Generate combined rule-based and AI-powered (Gemini/Groq) suggestions.
     """
-    try:
-        # Validate input
-        if not request.resume_text or not request.resume_text.strip():
-            raise HTTPException(
-                status_code=400,
-                detail="Resume text cannot be empty."
-            )
-        
-        if not request.score_data:
-            raise HTTPException(
-                status_code=400,
-                detail="Score data cannot be empty."
-            )
-        
-        if not request.target_job_title or not request.target_job_title.strip():
-            raise HTTPException(
-                status_code=400,
-                detail="Target job title cannot be empty."
-            )
-        
-        # Generate suggestions
-        suggestions = generate_suggestions(
-            request.resume_text,
-            request.score_data,
-            request.target_job_title
-        )
-        
-        # Prepare response
-        response_data = {
-            "success": True,
-            "data": {
-                "suggestions": suggestions
-            }
+    if not request.resume_text or not request.resume_text.strip():
+        raise HTTPException(status_code=400, detail="Resume text cannot be empty.")
+    if not request.score_data:
+        raise HTTPException(status_code=400, detail="Score data cannot be empty.")
+    if not request.target_job_title or not request.target_job_title.strip():
+        raise HTTPException(status_code=400, detail="Target job title cannot be empty.")
+
+    # 1. Rule-based suggestions (fast & guaranteed baseline)
+    rule_suggestions = generate_suggestions(
+        request.resume_text,
+        request.score_data,
+        request.target_job_title
+    )
+
+    # 2. Advanced AI suggestions via Gemini (with Groq fallback)
+    ai_enhanced = await get_enhanced_ai_suggestions(
+        request.resume_text,
+        request.target_job_title,
+        request.score_data
+    )
+
+    return JSONResponse(status_code=200, content={
+        "success": True,
+        "data": {
+            "suggestions": rule_suggestions,
+            "ai_enhanced": ai_enhanced
         }
-        
-        return JSONResponse(status_code=200, content=response_data)
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"An unexpected error occurred during suggestion generation: {str(e)}"
-        )
+    })
