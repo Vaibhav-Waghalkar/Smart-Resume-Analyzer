@@ -1,177 +1,175 @@
-# Smart Resume Analyzer AI v2.0 🚀
+# Smart Resume Analyzer — Editorial AI Career Studio 🚀
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.138.0-009688.svg?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![React](https://img.shields.io/badge/React-19-61DAFB.svg?logo=react&logoColor=black)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Vite-8-646CFF.svg?logo=vite&logoColor=white)](https://vitejs.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-38B2AC.svg?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
-[![Google Gemini](https://img.shields.io/badge/Gemini_3.8_Flash-Google_AI-4285F4.svg?logo=google&logoColor=white)](https://ai.google.dev/)
-[![Groq](https://img.shields.io/badge/Groq-Inference_Llama_3.3_&_Whisper-F55036.svg)](https://groq.com/)
+[![Google Gemini](https://img.shields.io/badge/Google_Gemini-Flash_&_Flash--Lite-4285F4.svg?logo=google&logoColor=white)](https://ai.google.dev/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-An intelligent, full-stack career acceleration platform combining **ATS Resume Scoring**, **Google Gemini 3.8 Flash bullet point rewrites**, **Voice-powered AI Mock Interviews with Web Speech & Groq Whisper fallback**, and **Daily Practice Streaks with 90-day activity heatmaps**.
+An intelligent, full-stack career acceleration platform combining **ATS Resume Diagnostic Scoring**, **Google Gemini Executive Bullet Point Rewrites (XYZ formula)**, **Voice-powered AI Mock Interviews with Web Speech & Gemini audio fallback**, and **Daily Practice Streaks with 90-day activity heatmaps**.
+
+Built with an editorial **"Ink and Sunset"** design system featuring dedicated feature accents, responsive mobile navigation, fluid typography (`clamp()`), and zero-friction standalone operation with **only a Gemini API key**.
 
 ---
 
-## 📸 Key Features & Architecture Preview
+## 📸 Screenshots
+
+### Desktop View (1440 × 900)
+
+| View | Dark Mode ("Warm Ink" `#0F0E13`) | Light Mode ("Cream" `#FAF6EF`) |
+| :--- | :--- | :--- |
+| **Landing Page** | ![Landing Dark](docs/screenshots/landing_dark_desktop.png) | ![Landing Light](docs/screenshots/landing_light_desktop.png) |
+| **Dashboard** | ![Dashboard Dark](docs/screenshots/dashboard_dark_desktop.png) | ![Dashboard Light](docs/screenshots/dashboard_light_desktop.png) |
+| **Resume Analyzer** *(Coral Accent)* | ![Analyzer Dark](docs/screenshots/analyzer_dark_desktop.png) | ![Analyzer Light](docs/screenshots/analyzer_light_desktop.png) |
+| **Mock Interview** *(Lavender Accent)* | ![Interview Dark](docs/screenshots/interview_dark_desktop.png) | ![Interview Light](docs/screenshots/interview_light_desktop.png) |
+| **Progress & Streaks** *(Amber Accent)* | ![Progress Dark](docs/screenshots/progress_dark_desktop.png) | ![Progress Light](docs/screenshots/progress_light_desktop.png) |
+
+### Mobile View (390 × 844)
+
+| Feature | Dark Mode | Light Mode |
+| :--- | :--- | :--- |
+| **Landing Hero** | <img src="docs/screenshots/landing_dark_mobile.png" width="280" /> | <img src="docs/screenshots/landing_light_mobile.png" width="280" /> |
+| **Mobile Dashboard** | <img src="docs/screenshots/dashboard_dark_mobile.png" width="280" /> | <img src="docs/screenshots/dashboard_light_mobile.png" width="280" /> |
+| **Mobile Analyzer** | <img src="docs/screenshots/analyzer_dark_mobile.png" width="280" /> | <img src="docs/screenshots/analyzer_light_mobile.png" width="280" /> |
+| **Mobile Interview** | <img src="docs/screenshots/interview_dark_mobile.png" width="280" /> | <img src="docs/screenshots/interview_light_mobile.png" width="280" /> |
+| **Mobile Progress & Heatmap** | <img src="docs/screenshots/progress_dark_mobile.png" width="280" /> | <img src="docs/screenshots/progress_light_mobile.png" width="280" /> |
+
+---
+
+## 🌟 Architecture & Capabilities
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                       SMART RESUME ANALYZER v2.0                            │
+│                 SMART RESUME ANALYZER · INK & SUNSET                        │
 ├───────────────────────────────┬─────────────────────────────────────────────┤
-│  🎯 1. Resume ATS Scorer      │  🎙️ 2. AI Mock Interview Simulator          │
-│  • PDF text extraction        │  • Personalized questions from resume & role│
-│  • Multi-factor match gauge   │  • Voice mode (Web Speech API + Whisper)    │
-│  • Skill match vs missing bars│  • SpeechSynthesis audio playback           │
-│  • Google XYZ formula rewrites│  • Gemini post-interview evaluation report  │
+│  🎯 1. Resume ATS Diagnostic  │  🎙️ 2. AI Mock Interview Simulator          │
+│  • Coral Accent (#FF7A59)     │  • Lavender Accent (#9B8CFF)                │
+│  • Multi-factor match gauge   │  • Tailored technical & behavioral questions│
+│  • Google XYZ formula rewrites│  • Web Speech API + Gemini audio fallback   │
+│  • Real-time missing keywords │  • Post-interview report & exemplar answers │
 ├───────────────────────────────┼─────────────────────────────────────────────┤
-│  🔥 3. Daily Streaks & Habits │  📈 4. Performance Analytics                │
-│  • Active practice streak     │  • Recharts score progression over time     │
-│  • 90-day visual heatmap grid │  • Weak area identification & action plans  │
-│  • JWT Auth & SQLite database │  • Production ready: Docker + CORS          │
+│  🔥 3. Daily Practice Streaks │  📈 4. Multi-Attempt Progression Curves     │
+│  • Amber Accent (#F5B841)     │  • Recharts score progression over time     │
+│  • 4-tier 90-day activity map │  • Recurring weakness diagnostics           │
+│  • Mobile bottom tab bar      │  • Fully functional with Gemini key alone   │
 └───────────────────────────────┴─────────────────────────────────────────────┘
 ```
 
----
+### 1. Robust AI Provider Abstraction (`backend/services/ai_provider.py`)
+- **Works 100% with only `GEMINI_API_KEY`**: Groq is completely optional.
+- **Configurable Models**:
+  - `GEMINI_MODEL` (default: `gemini-2.5-flash`): Powers deep ATS resume analysis and post-interview report compilation.
+  - `GEMINI_FAST_MODEL` (default: `gemini-2.5-flash-lite`): Powers fast, live question generation and low-latency interaction.
+- **Automatic Retries & Exponential Backoff**: Gracefully handles rate limits and 5xx errors.
+- **Optional Secondary Fallback**: Automatically tries OpenRouter or Groq **only if** their keys are specified in `.env`.
+- **Direct Audio Transcription Fallback**: If the browser does not support the Web Speech API (Firefox, iOS Safari), audio is recorded via `MediaRecorder` and transcribed directly using Gemini's native audio input via `/api/interview/transcribe`.
 
-## 🌟 Core Capabilities
-
-### 1. ATS Scoring & Executive Suggestions
-- **PDF Extraction**: Fast and reliable text extraction with `pdfplumber` and `PyPDF2`.
-- **Competency Subscores**: Real-time breakdown across Skill Match, Years of Experience, Education, and Section Completeness.
-- **Gemini 3.8 Flash Enhancements**:
-  - Automatically rewrites weak bullet points using Google's **XYZ Formula** (*Accomplished [X] as measured by [Y] by doing [Z]*).
-  - Flags critical missing keywords for 14+ target roles.
-  - ATS formatting checklists and quantifiable achievement tips.
-  - Strict JSON schema validation via **Pydantic** with automatic retries and Groq fallback.
-
-### 2. Voice-Enabled AI Mock Interview Simulator
-- **Dynamic Question Generation**: Generates technical, project, and behavioral questions blended directly from the candidate's actual resume projects.
-- **Dual Voice Support**:
-  - Speak your answers naturally with the **Web Speech API** or backend **Groq Whisper** (`/api/transcribe`).
-  - Listen to interviewer questions with built-in `speechSynthesis` (with an instant mute toggle).
-  - Live recording visualizer and speaking duration timer.
-- **Comprehensive Post-Interview Report**:
-  - No disruptive mid-interview feedback.
-  - Deep per-question grading, filler words audit, structure critique, and **what a 95%+ model answer looks like**.
-
-### 3. Habit Building, Streaks & Progress Tracking
-- **Daily Streak Engine**: Tracks daily activity (resume analysis or completed mock interview).
-- **Interactive 90-Day Heatmap**: GitHub-style activity contribution calendar.
-- **Score Progression Curves**: Multi-attempt progression charts rendered with **Recharts**.
-- **Recurring Weaknesses**: Identifies patterns where the candidate consistently loses points across sessions.
+### 2. "Ink and Sunset" Editorial Design System
+- **Dark Mode**: Warm ink background (`#0F0E13`), surface (`#18161D`), border (`#2A2732`), text (`#F3EEE6`), muted (`#9A94A6`).
+- **Light Mode**: Warm cream background (`#FAF6EF`), surface (`#FFFFFF`), border (`#E6DFD2`), text (`#1B1A22`), muted (`#6B6577`).
+- **Feature Accents**:
+  - **Resume Analyzer**: Coral (`#FF7A59` dark / `#E8573A` light)
+  - **Mock Interview**: Lavender (`#9B8CFF` dark / `#6F5FE0` light)
+  - **Progress / Streak**: Amber (`#F5B841` dark / `#D9951A` light)
+  - **Success / Good Score**: Mint (`#5FD6B0` dark / `#1F9E78` light)
+  - **Warning / Low Score**: Rose (`#F2708A` dark / `#D6476A` light)
+- **Typography**:
+  - Body: **Inter / Geist**
+  - Small labels, scores & metadata: **JetBrains Mono**
+  - Editorial accent word in headings: **Instrument Serif** italic (*"Land your dream role with precision"*)
+- **Subtle Texture**: Embedded noise overlay prevents flat digital appearance.
+- **Mobile First**: Fluid typography with `clamp()`, touch targets ≥ 44px, safe-area bottom insets, and bottom tab bar on mobile.
 
 ---
 
 ## 🛠️ Tech Stack
 
-### Frontend
-- **Framework**: React 19 + Vite 8
-- **Styling**: Tailwind CSS v4 + Vanilla CSS Design Tokens (Dark / Light mode toggle)
-- **Visualizations**: Recharts (Radial Gauge, Bar Charts, Score Curves)
-- **Icons & Motion**: Lucide React, Framer Motion, Canvas Confetti
-- **Audio & Voice**: Web Speech API (`SpeechRecognition` & `SpeechSynthesis`)
-
-### Backend
-- **Framework**: FastAPI (Async, Python 3.11+)
-- **Database**: SQLite (SQLAlchemy ORM, structured for straightforward PostgreSQL / Supabase migration)
-- **Security & Auth**: JWT Tokens, Password Hashing (`passlib[bcrypt]`), Rate Limiting (`slowapi`)
-- **AI Providers**:
-  - Primary: **Google Gemini 3.8 Flash** via REST JSON schema API
-  - Fallback / Whisper: **Groq** (`llama-3.3-70b-versatile` & `whisper-large-v3`)
+- **Frontend**: React 19, Vite 8, Tailwind CSS v4, Recharts, Lucide React, Framer Motion, Canvas Confetti.
+- **Backend**: FastAPI (Python 3.11+), SQLAlchemy, SQLite, Pydantic v2, HTTPX, PyPDF2 / pdfplumber.
+- **AI Engine**: Google Gemini API (`gemini-2.5-flash`, `gemini-2.5-flash-lite`), optional OpenRouter / Groq.
+- **Audio**: Browser Web Speech API (`SpeechRecognition` & `SpeechSynthesis`) + Gemini Multimodal Audio Transcription fallback.
 
 ---
 
-## 🚀 Quickstart & Local Setup
+## 🚀 Getting Started
 
-### Prerequisites
-- Python 3.10+ (or 3.11 recommended)
-- Node.js 18+ and npm
+### 1. Environment Configuration
 
-### 1. Clone the Repository
-```bash
-git clone https://github.com/Vaibhav-Waghalkar/Smart-Resume-Analyzer.git
-cd Smart-Resume-Analyzer
+#### Backend (`backend/.env`):
+```env
+# Required: Google Gemini API Key
+GEMINI_API_KEY=your_gemini_api_key_here
+
+# Configurable Models (Optional)
+GEMINI_MODEL=gemini-2.5-flash
+GEMINI_FAST_MODEL=gemini-2.5-flash-lite
+
+# Optional Fallback Providers (Only used if key is populated)
+GROQ_API_KEY=
+OPENROUTER_API_KEY=
+
+# Security & DB (Defaults preconfigured)
+JWT_SECRET=your_jwt_secret_here
+DATABASE_URL=sqlite:///./smart_resume.db
+CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173,http://localhost:5175,http://127.0.0.1:5175
+PORT=8000
+HOST=0.0.0.0
 ```
 
-### 2. Backend Setup
+#### Frontend (`frontend/.env`):
+```env
+VITE_API_URL=http://localhost:8000
+```
+
+---
+
+### 2. Launching Locally
+
+You can launch both servers simultaneously with the root script:
+```bash
+# Windows launcher (starts backend & frontend in dedicated windows and opens browser)
+start.bat
+```
+
+Or run manually:
+
+**Backend:**
 ```bash
 cd backend
-
-# Create virtual environment
 python -m venv venv
-# On Windows:
 .\venv\Scripts\activate
-# On Linux/macOS:
-source venv/bin/activate
-
-# Install dependencies
 pip install -r requirements.txt
-
-# Configure environment variables
-cp .env.example .env
-```
-Open `backend/.env` and insert your Gemini API Key:
-```env
-GEMINI_API_KEY=your_gemini_api_key_here
-GROQ_API_KEY=optional_groq_api_key_here
-JWT_SECRET=supersecret_jwt_key_min_32_chars
-DATABASE_URL=sqlite:///./smart_resume.db
-CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-Start the backend:
+**Frontend:**
 ```bash
-uvicorn main:app --reload --port 8000
-```
-API Documentation will be available at: [http://localhost:8000/docs](http://localhost:8000/docs)
-
-### 3. Frontend Setup
-```bash
-cd ../frontend
+cd frontend
 npm install
 npm run dev
 ```
-Open [http://localhost:5173](http://localhost:5173) in your browser.
+
+Open your browser at **http://localhost:5173** (or port assigned by Vite).
 
 ---
 
-## 🐳 Docker Deployment
+## 📸 Automated Screenshots
 
-To build and run the backend inside a Docker container:
+To re-generate all desktop (1440x900) and mobile (390x844) screenshots across light and dark modes:
+
 ```bash
-cd backend
-docker build -t smart-resume-backend .
-docker run -p 8000:8000 --env-file .env smart-resume-backend
+node scripts/take-screenshots.mjs
 ```
+All images are exported directly into `docs/screenshots/`.
 
 ---
 
-## 🌐 Production Deployment Guide
+## 🔒 Privacy & Honest AI Policy
 
-### Deploy Frontend on Vercel
-1. Push your repository to GitHub.
-2. In [Vercel Dashboard](https://vercel.com), click **Add New Project** and select `Smart-Resume-Analyzer`.
-3. Set the **Root Directory** to `frontend`.
-4. In **Environment Variables**, set:
-   - `VITE_API_URL`: Your deployed backend URL (e.g., `https://smart-resume-api.onrender.com`).
-5. Click **Deploy**.
-
-### Deploy Backend on Render
-1. In [Render Dashboard](https://render.com), create a new **Web Service**.
-2. Connect your GitHub repository.
-3. Configure the service:
-   - **Root Directory**: `backend`
-   - **Environment**: `Python 3` (or `Docker` using the included `backend/Dockerfile`)
-   - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `uvicorn main:app --host 0.0.0.0 --port $PORT`
-4. In **Environment Variables**, add:
-   - `GEMINI_API_KEY`: Your Google AI Studio API key
-   - `GROQ_API_KEY`: (Optional) Groq Cloud key
-   - `JWT_SECRET`: A secure random 32-character string
-   - `CORS_ORIGINS`: Your Vercel frontend domain (e.g., `https://smart-resume-analyzer.vercel.app`)
-5. Click **Create Web Service**.
+Direct API processing: your uploaded resumes and spoken responses are analyzed in real time through secure REST endpoints and are never stored or contributed to train public generative AI foundation models.
 
 ---
 
 ## 📄 License
-This project is open-source and licensed under the [MIT License](LICENSE).
+MIT License. Free to customize and distribute.

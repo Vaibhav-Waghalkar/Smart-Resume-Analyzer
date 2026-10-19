@@ -12,7 +12,9 @@ import { resumeApi } from './api/resumeApi';
 function MainApp() {
   const [activeTab, setActiveTab] = useState('landing');
   const [darkMode, setDarkMode] = useState(() => {
-    return localStorage.getItem('sra_theme') === 'dark' || true;
+    const saved = localStorage.getItem('sra_theme');
+    if (saved) return saved === 'dark';
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [streakData, setStreakData] = useState(null);
@@ -21,7 +23,7 @@ function MainApp() {
   const [analysisResults, setAnalysisResults] = useState(null);
   const { user } = useAuth();
 
-  // Apply dark mode class to root html element
+  // Apply dark mode class to root html element and persist
   useEffect(() => {
     const root = document.documentElement;
     if (darkMode) {
@@ -57,7 +59,7 @@ function MainApp() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--bg-page)] text-[var(--text-primary)] transition-colors duration-200">
+    <div className="min-h-screen flex flex-col bg-[var(--bg-page)] text-[var(--text-primary)] transition-colors duration-150">
       
       {/* Top Navigation */}
       <Navbar
@@ -70,7 +72,7 @@ function MainApp() {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1">
+      <main className="flex-1 pb-16 md:pb-0">
         {activeTab === 'landing' && (
           <LandingPage
             onGetStarted={() => setActiveTab('analyzer')}
@@ -103,20 +105,21 @@ function MainApp() {
           <ProgressPage
             streakData={streakData}
             progressData={progressData}
-            onRefresh={fetchOverview}
           />
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-[var(--border-color)] bg-[var(--bg-surface)] py-6 text-center text-xs text-[var(--text-secondary)]">
+      {/* Editorial Footer */}
+      <footer className="border-t border-[var(--border-color)] bg-[var(--bg-surface)] py-6 text-xs text-[var(--text-secondary)]">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p>© {new Date().getFullYear()} Smart Resume Analyzer. Powered by Google Gemini 3.8 & Groq.</p>
-          <div className="flex items-center gap-4">
-            <button onClick={() => setActiveTab('landing')} className="hover:text-emerald-500">Home</button>
-            <button onClick={() => setActiveTab('analyzer')} className="hover:text-emerald-500">ATS Scorer</button>
-            <button onClick={() => setActiveTab('interview')} className="hover:text-emerald-500">Mock Interview</button>
-            <button onClick={() => setActiveTab('progress')} className="hover:text-emerald-500">Streaks</button>
+          <p className="font-mono-label text-[11px] text-[var(--text-muted)]">
+            © {new Date().getFullYear()} Resume Analyzer Studio · Powered by Google Gemini
+          </p>
+          <div className="flex items-center gap-4 text-xs font-medium">
+            <button onClick={() => setActiveTab('landing')} className="hover:text-[var(--text-primary)]">Home</button>
+            <button onClick={() => setActiveTab('analyzer')} className="hover:text-[var(--accent-analyzer)]">ATS Scorer</button>
+            <button onClick={() => setActiveTab('interview')} className="hover:text-[var(--accent-interview)]">Mock Interview</button>
+            <button onClick={() => setActiveTab('progress')} className="hover:text-[var(--accent-progress)]">Streaks</button>
           </div>
         </div>
       </footer>

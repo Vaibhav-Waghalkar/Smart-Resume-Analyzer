@@ -119,7 +119,8 @@ Create 5 tailored interview questions ranging across Project, Technical, and Beh
     return await generate_structured_ai_response(
         prompt=prompt,
         system_instruction=QUESTION_GEN_SYSTEM_PROMPT,
-        pydantic_model=QuestionGenerationSchema
+        pydantic_model=QuestionGenerationSchema,
+        use_fast_model=True
     )
 
 
@@ -157,27 +158,15 @@ Produce the comprehensive Final Post-Interview Report strictly following JSON fo
     )
 
 
+async def transcribe_audio_file(file_bytes: bytes, filename: str, content_type: str = "audio/webm") -> Optional[str]:
+    """
+    Transcribes audio directly via Gemini's audio capability (works with no Groq key).
+    Falls back gracefully if key missing.
+    """
+    from services.ai_provider import transcribe_audio_gemini
+    return await transcribe_audio_gemini(file_bytes, content_type)
+
 async def transcribe_audio_groq(file_bytes: bytes, filename: str) -> Optional[str]:
-    """
-    Transcribes spoken audio using Groq Whisper model if Groq key is present.
-    """
-    groq_key = os.getenv("GROQ_API_KEY", "").strip()
-    if not groq_key:
-        return None
+    """Backward compatible wrapper"""
+    return await transcribe_audio_file(file_bytes, filename)
 
-    url = "https://api.groq.com/openai/v1/audio/transcriptions"
-    headers = {"Authorization": f"Bearer {groq_key}"}
-    files = {"file": (filename, file_bytes, "audio/m4a")}
-    data = {"model": "whisper-large-v3", "response_format": "json"}
-
-    try:
-        async with httpx.AsyncClient(timeout=45.0) as client:
-            res = await client.post(url, headers=headers, files=files, data=data)
-            if res.status_code == 200:
-                return res.json().get("text", "")
-            else:
-                logger.warning(f"Groq Whisper transcription failed ({res.status_code}): {res.text}")
-    except Exception as e:
-        logger.warning(f"Whisper transcription error: {e}")
-
-    return None

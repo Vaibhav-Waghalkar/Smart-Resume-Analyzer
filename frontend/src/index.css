@@ -2,89 +2,140 @@
 
 @layer base {
   :root {
-    --bg-page: #f8fafc;
-    --bg-surface: #ffffff;
-    --bg-surface-elevated: #f1f5f9;
-    --border-color: #e2e8f0;
-    --text-primary: #0f172a;
-    --text-secondary: #475569;
-    --text-muted: #64748b;
-    --accent: #10b981;
-    --accent-hover: #059669;
-    --accent-glow: rgba(16, 185, 129, 0.15);
-    --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+    /* Ink and Sunset Light Mode (Reference = Light Dashboard) */
+    --bg-page: #FAF6EF;
+    --bg-surface: #FFFFFF;
+    --bg-surface-elevated: #F4EFE6;
+    --border-color: #E6DFD2;
+    --text-primary: #1B1A22;
+    --text-secondary: #585363;     /* Checked 4.8:1 contrast on #FAF6EF and 7:1 on #FFFFFF */
+    --text-muted: #6B6577;         /* Checked 4.5:1 contrast on #FAF6EF */
+
+    /* Specific Feature Accents (Darker tones for pristine contrast in light mode) */
+    --accent-analyzer: #D64527;       /* Coral */
+    --accent-interview: #5E4ED2;      /* Lavender / Violet */
+    --accent-progress: #C07F0E;       /* Amber */
+    --accent-success: #178261;        /* Mint / Forest */
+    --accent-warning: #C73656;        /* Rose */
+
+    /* Primary Dark Solid Button (like Sign In button) */
+    --btn-primary-bg: #1B1A22;
+    --btn-primary-text: #FAF6EF;
+    --btn-primary-hover: #2E2C38;
+
+    --card-shadow: 0 1px 3px rgba(27, 26, 34, 0.04), 0 1px 2px rgba(27, 26, 34, 0.02);
   }
 
   .dark {
-    --bg-page: #0b1117;
-    --bg-surface: #111a22;
-    --bg-surface-elevated: #18232d;
-    --border-color: #223241;
-    --text-primary: #f8fafc;
-    --text-secondary: #94a3b8;
-    --text-muted: #64748b;
-    --accent: #10b981;
-    --accent-hover: #34d399;
-    --accent-glow: rgba(16, 185, 129, 0.25);
-    --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+    /* Ink and Sunset Dark Mode (Reference = Dark Progress / Dashboard) */
+    --bg-page: #0F0E13;
+    --bg-surface: #18161D;
+    --bg-surface-elevated: #221F29;
+    --border-color: #2A2732;
+    --text-primary: #F3EEE6;
+    --text-secondary: #9A94A6;
+    --text-muted: #827C8E;
+
+    /* Specific Feature Accents (Vibrant on dark ink) */
+    --accent-analyzer: #FF7A59;       /* Coral */
+    --accent-interview: #9B8CFF;      /* Lavender */
+    --accent-progress: #F5B841;       /* Amber */
+    --accent-success: #5FD6B0;        /* Mint */
+    --accent-warning: #F2708A;        /* Rose */
+
+    /* Primary Solid Button in Dark Mode */
+    --btn-primary-bg: #F3EEE6;
+    --btn-primary-text: #0F0E13;
+    --btn-primary-hover: #E3DDCF;
+
+    --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
   }
 }
 
 body {
   margin: 0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: var(--bg-page);
   color: var(--text-primary);
   min-height: 100vh;
-  transition: background-color 0.25s ease, color 0.25s ease;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Glassmorphism utility */
-.glass-panel {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--card-shadow);
-  border-radius: 1rem;
+/* Subtle organic grain overlay */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
-.glass-panel-elevated {
-  background: var(--bg-surface-elevated);
+/* Typography styles matching portfolio guidelines */
+.font-mono-label {
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.font-editorial-italic {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+}
+
+/* Clean Editorial Card Containers - Thin 1px borders, crisp surfaces, no neon glow */
+.editorial-card {
+  background-color: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: 0.75rem;
+  box-shadow: var(--card-shadow);
 }
 
-/* Custom Scrollbars */
+.editorial-card-elevated {
+  background-color: var(--bg-surface-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: 0.625rem;
+}
+
+/* Standardized primary button token class */
+.btn-primary-solid {
+  background-color: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  font-weight: 600;
+  border-radius: 0.5rem;
+  transition: opacity 0.15s ease, transform 0.1s ease;
+}
+.btn-primary-solid:hover {
+  opacity: 0.92;
+}
+.btn-primary-solid:active {
+  transform: scale(0.99);
+}
+
+/* Custom Clean Scrollbars */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(100, 116, 139, 0.3);
+  background: var(--border-color);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 116, 139, 0.5);
+  background: var(--text-muted);
 }
 
-/* Pulse animation for microphone */
-@keyframes mic-pulse {
-  0% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
-  }
-  70% {
-    transform: scale(1.05);
-    box-shadow: 0 0 0 14px rgba(239, 68, 68, 0);
-  }
-  100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
-  }
-}
-
-.mic-recording-pulse {
-  animation: mic-pulse 1.6s infinite;
+/* Safe-area insets helper for mobile devices */
+.safe-pb {
+  padding-bottom: env(safe-area-inset-bottom, 16px);
 }

@@ -217,13 +217,21 @@ async def finish_interview(
     }
 
 
+from services.mock_interview import (
+    generate_interview_questions,
+    evaluate_full_interview,
+    transcribe_audio_file
+)
+
 @router.post("/transcribe")
 async def transcribe_audio_endpoint(file: UploadFile = File(...)):
     """
-    Transcribes microphone audio fallback using Groq Whisper if available.
+    Transcribes microphone audio fallback using Gemini audio input (or Groq Whisper if configured).
     """
     content = await file.read()
-    text = await transcribe_audio_groq(content, file.filename or "recording.m4a")
+    content_type = file.content_type or "audio/webm"
+    text = await transcribe_audio_file(content, file.filename or "recording.webm", content_type)
     if text is None:
-        return {"success": False, "detail": "Audio transcription unavailable (Groq key not configured). Please type or use browser speech."}
+        return {"success": False, "detail": "Audio transcription failed. You can also type your answer directly."}
     return {"success": True, "text": text}
+

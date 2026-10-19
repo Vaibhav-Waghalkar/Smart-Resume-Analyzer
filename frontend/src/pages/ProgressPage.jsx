@@ -1,15 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { 
   Flame, 
   TrendingUp, 
   Calendar, 
   Award, 
-  CheckCircle, 
-  AlertTriangle,
-  Lightbulb,
-  ArrowUpRight,
-  Clock,
-  Sparkles
+  Lightbulb
 } from 'lucide-react';
 import { 
   ResponsiveContainer, 
@@ -20,10 +15,8 @@ import {
   Tooltip, 
   CartesianGrid 
 } from 'recharts';
-import { resumeApi } from '../api/resumeApi';
 
-export default function ProgressPage({ streakData, progressData, onRefresh }) {
-  const [loading, setLoading] = useState(false);
+export default function ProgressPage({ streakData, progressData }) {
   const streak = streakData || { current_streak: 1, longest_streak: 1, total_active_days: 1, heatmap: [] };
   const stats = progressData?.stats || {};
   const resumeTrend = progressData?.resume_trend || [];
@@ -31,197 +24,222 @@ export default function ProgressPage({ streakData, progressData, onRefresh }) {
   const recurringWeakAreas = progressData?.recurring_weak_areas || [];
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div className="space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
       
-      {/* Top Header */}
-      <div className="glass-panel p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      {/* Header with Amber Streak Accent */}
+      <div className="editorial-card p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border-l-2 border-l-[var(--accent-progress)]">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
-              Analytics & Progression
+            <span className="font-mono-label text-[10px] text-[var(--accent-progress)]">
+              PROGRESSION & HABITS
             </span>
+            <span className="text-xs text-[var(--text-muted)]">• Continuous practice</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)]">
-            Progress Tracking & Daily Streaks
+          <h1 className="text-xl sm:text-2xl font-normal text-[var(--text-primary)]">
+            Performance Trajectory & <span className="font-editorial-italic text-2xl sm:text-3xl font-medium">Activity</span>
           </h1>
           <p className="text-xs text-[var(--text-secondary)] mt-1">
-            Measure your ATS score growth, interview readiness curves, and daily consistency.
+            Track your ATS score growth, mock interview readiness curves, and daily practice streak.
           </p>
         </div>
 
-        {/* Streak Highlight Card */}
-        <div className="flex items-center gap-4 p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/25 text-amber-500">
-          <Flame className="w-10 h-10 fill-amber-500 shrink-0" />
+        <div className="flex items-center gap-3 p-3 rounded-md border border-[var(--border-color)] bg-[var(--bg-surface-elevated)]">
+          <Flame className="w-8 h-8 text-[var(--accent-progress)] fill-[var(--accent-progress)] shrink-0" />
           <div>
-            <div className="text-2xl font-black leading-none">{streak.current_streak} Days</div>
-            <div className="text-[11px] font-semibold text-[var(--text-secondary)] mt-0.5">
-              Longest Streak: {streak.longest_streak} Days
+            <div className="text-xl font-mono-label font-bold text-[var(--text-primary)] leading-none">
+              {streak.current_streak} DAYS
+            </div>
+            <div className="text-[10px] font-mono-label text-[var(--text-muted)] mt-1">
+              LONGEST: {streak.longest_streak} DAYS
             </div>
           </div>
         </div>
       </div>
 
-      {/* KPI Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <div className="glass-panel p-5">
-          <span className="text-xs text-[var(--text-muted)] font-medium">Resumes Analyzed</span>
-          <div className="text-2xl font-extrabold text-[var(--text-primary)] mt-1">
+      {/* KPI Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <div className="editorial-card p-5 space-y-1">
+          <span className="font-mono-label text-[10px] text-[var(--text-muted)]">RESUMES ANALYZED</span>
+          <div className="text-2xl font-mono-label font-bold text-[var(--text-primary)]">
             {stats.total_resumes_analyzed || 0}
           </div>
-          <span className="text-[11px] text-emerald-500 font-semibold mt-1 block">
-            {stats.resume_improvement > 0 ? `+${stats.resume_improvement}% overall gain` : 'Baseline established'}
+          <span className="font-mono-label text-[10px] text-[var(--accent-success)] block">
+            {stats.resume_improvement > 0 ? `+${stats.resume_improvement}% GAIN` : 'CALIBRATING'}
           </span>
         </div>
 
-        <div className="glass-panel p-5">
-          <span className="text-xs text-[var(--text-muted)] font-medium">Interviews Completed</span>
-          <div className="text-2xl font-extrabold text-[var(--text-primary)] mt-1">
+        <div className="editorial-card p-5 space-y-1">
+          <span className="font-mono-label text-[10px] text-[var(--text-muted)]">INTERVIEWS COMPLETED</span>
+          <div className="text-2xl font-mono-label font-bold text-[var(--text-primary)]">
             {stats.total_interviews_completed || 0}
           </div>
-          <span className="text-[11px] text-emerald-500 font-semibold mt-1 block">
-            {stats.interview_improvement > 0 ? `+${stats.interview_improvement}% score growth` : 'Practicing questions'}
+          <span className="font-mono-label text-[10px] text-[var(--accent-interview)] block">
+            {stats.interview_improvement > 0 ? `+${stats.interview_improvement}% READINESS` : 'REHEARSING'}
           </span>
         </div>
 
-        <div className="glass-panel p-5">
-          <span className="text-xs text-[var(--text-muted)] font-medium">Latest Resume Match</span>
-          <div className="text-2xl font-extrabold text-[var(--text-primary)] mt-1">
-            {stats.latest_resume_score ? `${stats.latest_resume_score}%` : 'N/A'}
+        <div className="editorial-card p-5 space-y-1">
+          <span className="font-mono-label text-[10px] text-[var(--text-muted)]">LATEST MATCH</span>
+          <div className="text-2xl font-mono-label font-bold text-[var(--text-primary)]">
+            {stats.latest_resume_score ? `${stats.latest_resume_score}%` : '—'}
           </div>
-          <span className="text-[11px] text-[var(--text-secondary)] mt-1 block">
-            Targeting tech roles
+          <span className="font-mono-label text-[10px] text-[var(--text-muted)] block">
+            TARGET PROFILE
           </span>
         </div>
 
-        <div className="glass-panel p-5">
-          <span className="text-xs text-[var(--text-muted)] font-medium">Total Active Days</span>
-          <div className="text-2xl font-extrabold text-[var(--text-primary)] mt-1">
+        <div className="editorial-card p-5 space-y-1">
+          <span className="font-mono-label text-[10px] text-[var(--text-muted)]">ACTIVE PRACTICE DAYS</span>
+          <div className="text-2xl font-mono-label font-bold text-[var(--text-primary)]">
             {streak.total_active_days || 1}
           </div>
-          <span className="text-[11px] text-purple-400 font-semibold mt-1 block">
-            Consistent preparation
-          </span>
-        </div>
-      </div>
-
-      {/* 90-Day Calendar Heatmap */}
-      <div className="glass-panel p-6 sm:p-8 space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-base font-bold text-[var(--text-primary)] flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-emerald-500" />
-            90-Day Daily Activity Heatmap
-          </h2>
-          <span className="text-xs text-[var(--text-muted)]">
-            Active if you analyzed a resume or completed an interview
+          <span className="font-mono-label text-[10px] text-[var(--accent-progress)] block">
+            STREAK ACTIVE
           </span>
         </div>
 
-        {/* Heatmap Grid */}
-        <div className="flex flex-wrap gap-1.5 pt-2">
-          {streak.heatmap && streak.heatmap.length > 0 ? (
-            streak.heatmap.map((cell, idx) => (
-              <div
-                key={idx}
-                title={`${cell.date}: ${cell.active ? 'Active' : 'No activity'}`}
-                className={`w-3.5 h-3.5 rounded-sm transition-transform hover:scale-125 cursor-pointer ${
-                  cell.active 
-                    ? 'bg-emerald-500 shadow-sm shadow-emerald-500/50' 
-                    : 'bg-[var(--bg-surface-elevated)] border border-[var(--border-color)]'
-                }`}
-              />
-            ))
-          ) : (
-            <p className="text-xs text-[var(--text-muted)]">No streak activity recorded yet.</p>
-          )}
+      </div>
+
+      {/* 90-Day Activity Heatmap (4-level Amber ramp) */}
+      <div className="editorial-card p-6 space-y-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-[var(--border-color)] pb-3">
+          <div className="flex items-center gap-2">
+            <Calendar className="w-4 h-4 text-[var(--accent-progress)]" />
+            <h2 className="text-sm font-semibold text-[var(--text-primary)]">
+              90-Day Daily Activity Heatmap
+            </h2>
+          </div>
+          <span className="font-mono-label text-[10px] text-[var(--text-muted)]">
+            LOGGED PRACTICE SESSIONS
+          </span>
         </div>
 
-        <div className="flex items-center justify-end gap-2 text-[11px] text-[var(--text-muted)] pt-2">
-          <span>Less</span>
-          <span className="w-3 h-3 rounded-sm bg-[var(--bg-surface-elevated)] border border-[var(--border-color)]" />
-          <span className="w-3 h-3 rounded-sm bg-emerald-500/40" />
-          <span className="w-3 h-3 rounded-sm bg-emerald-500" />
-          <span>More Active</span>
+        {/* Heatmap Grid with horizontal scroll on small screens */}
+        <div className="overflow-x-auto pb-2">
+          <div className="flex flex-wrap gap-1.5 min-w-[500px]">
+            {streak.heatmap && streak.heatmap.length > 0 ? (
+              streak.heatmap.map((cell, idx) => {
+                // 4-level ramp from border-color to amber
+                const activityLevel = cell.count || (cell.active ? 3 : 0);
+                const bgColors = [
+                  'var(--bg-surface-elevated)', // Level 0: empty
+                  'rgba(245, 184, 65, 0.3)',   // Level 1: light amber
+                  'rgba(245, 184, 65, 0.65)',  // Level 2: medium amber
+                  'var(--accent-progress)'      // Level 3: full amber
+                ];
+                const activeColor = bgColors[Math.min(activityLevel, 3)];
+
+                return (
+                  <div
+                    key={idx}
+                    title={`${cell.date}: ${cell.active ? 'Activity recorded' : 'No activity'}`}
+                    style={{ backgroundColor: activeColor }}
+                    className="w-3.5 h-3.5 rounded-xs border border-[var(--border-color)] hover:scale-115 transition-transform cursor-pointer"
+                  />
+                );
+              })
+            ) : (
+              <p className="text-xs text-[var(--text-muted)]">No streak activity recorded yet.</p>
+            )}
+          </div>
+        </div>
+
+        {/* 4-level Legend */}
+        <div className="flex items-center justify-end gap-2 text-[10px] font-mono-label text-[var(--text-muted)] pt-1">
+          <span>LESS</span>
+          <span className="w-3 h-3 rounded-xs border border-[var(--border-color)] bg-[var(--bg-surface-elevated)]" />
+          <span className="w-3 h-3 rounded-xs border border-[var(--border-color)]" style={{ backgroundColor: 'rgba(245, 184, 65, 0.3)' }} />
+          <span className="w-3 h-3 rounded-xs border border-[var(--border-color)]" style={{ backgroundColor: 'rgba(245, 184, 65, 0.65)' }} />
+          <span className="w-3 h-3 rounded-xs border border-[var(--border-color)]" style={{ backgroundColor: 'var(--accent-progress)' }} />
+          <span>MORE</span>
         </div>
       </div>
 
-      {/* Score Trends Over Time Charts */}
+      {/* Score Trend Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
-        {/* Resume Score Trend */}
-        <div className="glass-panel p-6 space-y-4">
-          <h3 className="text-sm font-bold text-[var(--text-primary)] flex items-center justify-between">
-            <span>Resume ATS Score Over Time</span>
-            <TrendingUp className="w-4 h-4 text-emerald-500" />
-          </h3>
+        {/* Resume ATS Score Trend */}
+        <div className="editorial-card p-6 space-y-4">
+          <div className="flex items-center justify-between border-b border-[var(--border-color)] pb-3">
+            <span className="font-mono-label text-[11px] text-[var(--text-muted)]">
+              RESUME MATCH TRAJECTORY
+            </span>
+            <TrendingUp className="w-3.5 h-3.5 text-[var(--accent-analyzer)]" />
+          </div>
 
-          <div className="h-64 w-full">
+          <div className="h-60 w-full">
             {resumeTrend.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={resumeTrend}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
-                  <XAxis dataKey="date" stroke="var(--text-muted)" fontSize={11} />
-                  <YAxis domain={[0, 100]} stroke="var(--text-muted)" fontSize={11} />
+                  <CartesianGrid strokeDasharray="2 2" stroke="var(--border-color)" vertical={false} />
+                  <XAxis dataKey="date" stroke="var(--text-muted)" fontSize={10} tickLine={false} />
+                  <YAxis domain={[0, 100]} stroke="var(--text-muted)" fontSize={10} tickLine={false} />
                   <Tooltip 
                     contentStyle={{ 
                       backgroundColor: 'var(--bg-surface)', 
                       borderColor: 'var(--border-color)',
-                      borderRadius: '8px',
+                      borderRadius: '6px',
                       color: 'var(--text-primary)',
-                      fontSize: '12px'
+                      fontSize: '11px',
+                      fontFamily: 'JetBrains Mono'
                     }} 
                   />
                   <Line 
                     type="monotone" 
                     dataKey="score" 
-                    stroke="#10b981" 
-                    strokeWidth={3} 
-                    dot={{ fill: '#10b981', r: 4 }} 
+                    stroke="var(--accent-analyzer)" 
+                    strokeWidth={2} 
+                    dot={{ fill: 'var(--accent-analyzer)', r: 3 }} 
                   />
                 </LineChart>
               </ResponsiveContainer>
             ) : (
-              <div className="h-full flex items-center justify-center text-xs text-[var(--text-muted)]">
-                Analyze at least 1 resume to generate trend chart.
+              <div className="h-full flex items-center justify-center text-xs text-[var(--text-muted)] font-mono-label">
+                ANALYZE AT LEAST 1 RESUME TO PLOT TREND
               </div>
             )}
           </div>
         </div>
 
-        {/* Interview Score Trend */}
-        <div className="glass-panel p-6 space-y-4">
-          <h3 className="text-sm font-bold text-[var(--text-primary)] flex items-center justify-between">
-            <span>Interview Performance Over Time</span>
-            <Award className="w-4 h-4 text-blue-500" />
-          </h3>
+        {/* Interview Performance Trend */}
+        <div className="editorial-card p-6 space-y-4">
+          <div className="flex items-center justify-between border-b border-[var(--border-color)] pb-3">
+            <span className="font-mono-label text-[11px] text-[var(--text-muted)]">
+              MOCK INTERVIEW READINESS
+            </span>
+            <Award className="w-3.5 h-3.5 text-[var(--accent-interview)]" />
+          </div>
 
-          <div className="h-64 w-full">
+          <div className="h-60 w-full">
             {interviewTrend.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={interviewTrend}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
-                  <XAxis dataKey="date" stroke="var(--text-muted)" fontSize={11} />
-                  <YAxis domain={[0, 100]} stroke="var(--text-muted)" fontSize={11} />
+                  <CartesianGrid strokeDasharray="2 2" stroke="var(--border-color)" vertical={false} />
+                  <XAxis dataKey="date" stroke="var(--text-muted)" fontSize={10} tickLine={false} />
+                  <YAxis domain={[0, 100]} stroke="var(--text-muted)" fontSize={10} tickLine={false} />
                   <Tooltip 
                     contentStyle={{ 
                       backgroundColor: 'var(--bg-surface)', 
                       borderColor: 'var(--border-color)',
-                      borderRadius: '8px',
+                      borderRadius: '6px',
                       color: 'var(--text-primary)',
-                      fontSize: '12px'
+                      fontSize: '11px',
+                      fontFamily: 'JetBrains Mono'
                     }} 
                   />
                   <Line 
                     type="monotone" 
                     dataKey="score" 
-                    stroke="#3b82f6" 
-                    strokeWidth={3} 
-                    dot={{ fill: '#3b82f6', r: 4 }} 
+                    stroke="var(--accent-interview)" 
+                    strokeWidth={2} 
+                    dot={{ fill: 'var(--accent-interview)', r: 3 }} 
                   />
                 </LineChart>
               </ResponsiveContainer>
             ) : (
-              <div className="h-full flex items-center justify-center text-xs text-[var(--text-muted)]">
-                Complete at least 1 mock interview to populate performance trend.
+              <div className="h-full flex items-center justify-center text-xs text-[var(--text-muted)] font-mono-label">
+                COMPLETE 1 INTERVIEW TO PLOT TREND
               </div>
             )}
           </div>
@@ -230,19 +248,19 @@ export default function ProgressPage({ streakData, progressData, onRefresh }) {
       </div>
 
       {/* Recurring Weak Areas Section */}
-      <div className="glass-panel p-6 space-y-4">
-        <h3 className="text-sm font-bold text-[var(--text-primary)] flex items-center gap-2">
-          <Lightbulb className="w-4 h-4 text-amber-500" />
-          Identified Weak Areas & Recommended Focus
+      <div className="editorial-card p-6 space-y-4">
+        <h3 className="font-mono-label text-[11px] text-[var(--text-primary)] font-bold flex items-center gap-2">
+          <Lightbulb className="w-4 h-4 text-[var(--accent-progress)]" />
+          IDENTIFIED FOCUS & RECURRING WEAKNESSES
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {recurringWeakAreas.map((w, idx) => (
-            <div key={idx} className="p-4 rounded-xl bg-[var(--bg-surface-elevated)] border border-[var(--border-color)] space-y-2">
+            <div key={idx} className="editorial-card-elevated p-4 space-y-2">
               <div className="flex items-center justify-between">
-                <span className="font-bold text-xs text-[var(--text-primary)]">{w.area}</span>
-                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/20">
-                  {w.frequency} Priority
+                <span className="font-semibold text-xs text-[var(--text-primary)]">{w.area}</span>
+                <span className="font-mono-label text-[9px] px-1.5 py-0.5 rounded border border-[var(--border-color)] bg-[var(--bg-surface)] text-[var(--accent-progress)] font-bold">
+                  {w.frequency} PRIORITY
                 </span>
               </div>
               <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
